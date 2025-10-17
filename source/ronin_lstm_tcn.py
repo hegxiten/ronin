@@ -358,7 +358,7 @@ def test(args, **kwargs):
         model_data = json.load(f)
 
     if device.type == 'cpu':
-        checkpoint = torch.load(args.model_path, map_location=lambda storage, location: storage)
+        checkpoint = torch.load(args.model_path, map_location=lambda storage, location: storage, weights_only=False)
     else:
         checkpoint = torch.load(args.model_path, map_location={model_data['device']: args.device})
 
