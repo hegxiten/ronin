@@ -170,3 +170,34 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+
+# RoNIN Project - Data and Models
+# Ignore large data files and model checkpoints
+Data/
+models/
+*.hdf5
+*.h5
+*.pt
+*.pth
+*.ckpt
+
+# Experiment outputs (keep configs, ignore large files)
+experiments/*/plots/
+experiments/*/checkpoints/
+experiments/*/*.pt
+experiments/*/*.pth
+
+# Notebooks checkpoints and outputs
+notebooks/.ipynb_checkpoints/
+notebooks/*_files/
+
+# Cache directories
+cache/
+.cache/
+__pycache__/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
