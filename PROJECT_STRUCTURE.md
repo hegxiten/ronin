@@ -10,12 +10,12 @@ ronin/
 ├── lists/                       # Original RoNIN data splits
 ├── config/                      # Original RoNIN configurations
 │
-├── Data/                        # All datasets
+├── datasets/                    # All datasets
 │   ├── ronin/                   # Original RoNIN dataset (152 sequences)
 │   │   ├── a001_1/
 │   │   ├── a001_2/
 │   │   └── ...
-│   └── clr_data/                 # Your custom datasets
+│   └── clr_data/                # CLR custom datasets
 │       └── README.md
 │
 ├── models/                      # All model checkpoints
@@ -27,10 +27,10 @@ ronin/
 │   ├── transfer_learning/       # Transfer learning experiments
 │   └── from_scratch/            # Models trained from scratch
 │
-├── clr_lists/                    # Your custom data split lists
+├── clr_lists/                   # CLR custom data split lists
 │   └── README.md
 │
-├── clr_source/                   # Your custom code
+├── clr_source/                  # CLR custom code
 │   └── README.md
 │
 ├── experiments/                 # Experiment tracking
@@ -44,7 +44,7 @@ ronin/
 ### 1. Train with Original RoNIN Data
 ```bash
 python source/ronin_resnet.py --mode train \
-  --root_dir Data/ronin \
+  --root_dir datasets/ronin \
   --train_list lists/list_train.txt \
   --out_dir models/from_scratch/exp_001_baseline
 ```
@@ -52,19 +52,19 @@ python source/ronin_resnet.py --mode train \
 ### 2. Test with Pretrained Model
 ```bash
 python source/ronin_resnet.py --mode test \
-  --root_dir Data/ronin \
+  --root_dir datasets/ronin \
   --test_list lists/list_test_seen.txt \
   --model_path models/pretrained/ronin_resnet/checkpoint_gsn_latest.pt \
   --out_dir experiments/exp_001_baseline
 ```
 
-### 3. Transfer Learning with Custom Data
+### 3. Transfer Learning with CLR Data
 ```bash
-# First, prepare your data in Data/clr_data/
+# First, prepare your data in datasets/clr_data/
 # Create train/val/test lists in clr_lists/
 
 python source/ronin_lstm_tcn.py train \
-  --data_dir Data/clr_data \
+  --data_dir datasets/clr_data \
   --train_list clr_lists/clr_train.txt \
   --val_list clr_lists/clr_val.txt \
   --continue_from models/pretrained/ronin_lstm/checkpoints/ronin_lstm_checkpoint.pt \
@@ -74,8 +74,8 @@ python source/ronin_lstm_tcn.py train \
 ## Key Paths
 
 ### Data
-- **RoNIN dataset**: `Data/ronin/`
-- **Custom data**: `Data/clr_data/`
+- **RoNIN dataset**: `datasets/ronin/`
+- **CLR data**: `datasets/clr_data/`
 
 ### Models
 - **Pretrained ResNet**: `models/pretrained/ronin_resnet/checkpoint_gsn_latest.pt`
@@ -97,11 +97,45 @@ python source/ronin_lstm_tcn.py train \
 4. **Version control** - Commit code changes, not data/models
 5. **Reproducibility** - Save configs with each experiment
 
+## S3 Storage
+
+All datasets and models are backed up to AWS S3:
+
+**Bucket**: `s3://clr-njt-imu-ml/`
+
+### S3 Structure
+```
+s3://clr-njt-imu-ml/
+├── datasets/
+│   ├── ronin/              # RoNIN dataset
+│   └── clr/                # CLR dataset
+├── models/
+│   ├── pretrained/         # Pretrained models
+│   ├── transfer_learning/  # Transfer learning experiments
+│   └── from_scratch/       # Models trained from scratch
+└── experiments/            # Experiment results
+```
+
+### Sync Commands
+```bash
+# Upload datasets to S3
+aws s3 sync datasets/ronin/ s3://clr-njt-imu-ml/datasets/ronin/ --exclude "Data/*" --exclude "Pretrained_Models/*"
+aws s3 sync datasets/clr_data/ s3://clr-njt-imu-ml/datasets/clr/
+
+# Upload models to S3
+aws s3 sync models/transfer_learning/ s3://clr-njt-imu-ml/models/transfer_learning/
+aws s3 sync models/from_scratch/ s3://clr-njt-imu-ml/models/from_scratch/
+
+# Download from S3
+aws s3 sync s3://clr-njt-imu-ml/datasets/ronin/ datasets/ronin/
+aws s3 sync s3://clr-njt-imu-ml/models/pretrained/ models/pretrained/
+```
+
 ## Git Ignore Recommendations
 
 Add to `.gitignore`:
 ```
-Data/
+datasets/
 models/
 experiments/*/plots/
 experiments/*/checkpoints/
