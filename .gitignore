@@ -201,3 +201,9 @@ __pycache__/
 *.bak
 *.swp
 *~
+
+# Context files
+*.context
+
+# PDF files
+*.pdf
