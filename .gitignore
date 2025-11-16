@@ -173,7 +173,7 @@ fabric.properties
 
 # RoNIN Project - Data and Models
 # Ignore large data files and model checkpoints
-Data/
+datasets/
 models/
 *.hdf5
 *.h5
